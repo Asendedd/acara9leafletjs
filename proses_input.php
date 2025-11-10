@@ -1,33 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Hasil Input</title>
-</head>
-<body>
-    <h1>Hasil Data Input</h1>
+<?php
+//koneksi to database
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "mysql";
 
-    <?php
-    // Cek apakah data sudah dikirim melalui metode POST
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        
-        // Ambil data yang dikirim dari form_input.php
-        $kecamatan = $_POST['kecamatan'];
-        $luas = $_POST['luas'];
-        $penduduk = $_POST['penduduk'];
+//Membuat Koneksi
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-        // Tampilkan data yang sudah diproses (atau bisa juga di-insert ke database di sini)
-        echo "<p>Kecamatan yang diinput: **" . htmlspecialchars($kecamatan) . "**</p>";
-        echo "<p>Luas yang diinput: **" . htmlspecialchars($luas) . "**</p>";
-        echo "<p>Jumlah Penduduk yang diinput: **" . htmlspecialchars($penduduk) . "**</p>";
-        
-    } else {
-        // Jika diakses tanpa melalui form POST
-        echo "<p>Akses tidak valid. Silakan isi form terlebih dahulu.</p>";
-    }
-    ?>
+//Cek Koneksi
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
-    <br>
-    <a href="latihan7c.php">Kembali ke Form</a>
+// Ambil data yang dikirim dari form
+$kecamatan = $_POST['kecamatan'];
+$longitude = $_POST['longitude'];
+$latitude = $_POST['latitude'];
+$luas = $_POST['luas'];
+$jumlah_penduduk = $_POST['jumlah_penduduk'];
 
-</body>
-</html>
+// prepare and bind
+$stmt = $conn->prepare("INSERT INTO data_kecamatan (kecamatan, longitude, latitude, luas, jumlah_penduduk) VALUES (?, ?, ?, ?, ?)");
+$stmt->bind_param("sddii", $kecamatan, $longitude, $latitude, $luas, $jumlah_penduduk);
+
+// execute and check
+if ($stmt->execute()) {
+    echo "New record created successfully";
+} else {
+    echo "Error: " . $stmt->error;
+}
+
+$stmt->close();
+$conn->close();
+
+header("Location: index.php");
+?>

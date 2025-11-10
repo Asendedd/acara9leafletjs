@@ -20,17 +20,18 @@
         die("Connection failed: " . $conn->connect_error); 
     } 
 
-$sql = "UPDATE penduduk SET kecamatan='$kecamatan', longitude=$longitude, 
-latitude=$latitude, luas=$luas, jumlah_penduduk=$jumlah_penduduk WHERE 
-id=$id"; 
+    $sql = "UPDATE data_kecamatan SET kecamatan=?, longitude=?, latitude=?, luas=?, jumlah_penduduk=? WHERE id=?"; 
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sddiii", $kecamatan, $longitude, $latitude, $luas, $jumlah_penduduk, $id);
 
-    if ($conn->query($sql) === TRUE) { 
+    if ($stmt->execute()) { 
       echo "Record edited successfully"; 
     } else { 
       echo "Error: " . $sql . "<br>" . $conn->error; 
     } 
 
+    $stmt->close();
     $conn->close(); 
 
-    header("Location: index.php"); 
+    header("Location: ../index.php"); 
 ?> 

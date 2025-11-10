@@ -36,7 +36,7 @@
 $servername = "localhost";
 $username   = "root";
 $password   = "";
-$dbname     = "data_kecamatan";
+$dbname     = "mysql";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -65,7 +65,7 @@ echo "<script>const dataWilayah = " . json_encode($data) . ";</script>";
 ?>
 
 <script>
-// Inisialisasi peta tanpa posisi awal
+// Inisialisasi peta
 const map = L.map('map');
 
 // Tambahkan tile layer dari OpenStreetMap
@@ -76,3 +76,28 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // Array untuk menyimpan posisi marker
 let markers = [];
+
+if (dataWilayah.length > 0) {
+    // Loop melalui data dan tambahkan marker
+    dataWilayah.forEach(function(wilayah) {
+        if (wilayah.latitude && wilayah.longitude) {
+            const marker = L.marker([wilayah.latitude, wilayah.longitude]).addTo(map);
+            marker.bindPopup("<b>" + wilayah.kecamatan + "</b><br>Luas: " + wilayah.luas + " km²<br>Jumlah Penduduk: " + wilayah.jumlah_penduduk);
+            markers.push(marker);
+        }
+    });
+
+    // Atur view peta berdasarkan marker pertama
+    if (markers.length > 0) {
+        map.setView([dataWilayah[0].latitude, dataWilayah[0].longitude], 13);
+    } else {
+        // Fallback view jika tidak ada marker
+        map.setView([-7.7956, 110.3695], 12); // Default view of Yogyakarta
+    }
+} else {
+    // Fallback view jika tidak ada data
+    map.setView([-7.7956, 110.3695], 12); // Default view of Yogyakarta
+}
+</script>
+</body>
+</html>

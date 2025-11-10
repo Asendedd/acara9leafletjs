@@ -15,14 +15,18 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error); 
 } 
 
- //DELETE FROM table_name WHERE condition; 
-$sql = "DELETE FROM penduduk WHERE id = $id"; 
+// prepare and bind
+$stmt = $conn->prepare("DELETE FROM data_kecamatan WHERE id = ?");
+$stmt->bind_param("i", $id);
 
-if ($conn->query($sql) === TRUE) { 
-echo "Record with id = $id deleted successfully"; 
+// execute and check
+if ($stmt->execute()) { 
+  echo "Record with id = $id deleted successfully"; 
 } else { 
-echo "Error: " . $sql . "<br>" . $conn->error; 
+  echo "Error: " . $stmt->error; 
 } 
+
+$stmt->close();
 $conn->close(); 
-header("Location: index.php"); 
+header("Location: ../index.php"); 
 ?>
